@@ -16,6 +16,10 @@ const Contact = () => {
         message: ''
     });
 
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState(null);
+
     const services = [
         'Infrastructure Sécurisée',
         'Pentest',
@@ -24,16 +28,111 @@ const Contact = () => {
         'Autre'
     ];
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+    // Sanitize input to prevent XSS
+    const sanitizeInput = (input) => {
+        return input
+            .replace(/[<>]/g, '') // Remove < and >
+            .trim();
     };
 
-    const handleSubmit = (e) => {
+    // Validate email format
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    // Validate phone format (French)
+    const validatePhone = (phone) => {
+        if (!phone) return true; // Optional field
+        const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+        return phoneRegex.test(phone.replace(/\s/g, ''));
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        const sanitizedValue = sanitizeInput(value);
+        
+        setFormData({
+            ...formData,
+            [name]: sanitizedValue
+        });
+
+        // Clear error for this field
+        if (errors[name]) {
+            setErrors({
+                ...errors,
+                [name]: ''
+            });
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Required fields
+        if (!formData.nom.trim()) newErrors.nom = 'Le nom est requis';
+        if (!formData.prenom.trim()) newErrors.prenom = 'Le prénom est requis';
+        if (!formData.email.trim()) {
+            newErrors.email = 'L\'email est requis';
+        } else if (!validateEmail(formData.email)) {
+            newErrors.email = 'Email invalide';
+        }
+        if (!formData.service) newErrors.service = 'Veuillez sélectionner un service';
+        if (!formData.message.trim()) {
+            newErrors.message = 'Le message est requis';
+        } else if (formData.message.length < 10) {
+            newErrors.message = 'Le message doit contenir au moins 10 caractères';
+        }
+
+        // Optional phone validation
+        if (formData.telephone && !validatePhone(formData.telephone)) {
+            newErrors.telephone = 'Numéro de téléphone invalide';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
+        
+        if (!validateForm()) {
+            setSubmitStatus({ type: 'error', message: 'Veuillez corriger les erreurs dans le formulaire' });
+            return;
+        }
+
+        setIsSubmitting(true);
+        setSubmitStatus(null);
+
+        try {
+            // Simulate API call (replace with actual endpoint)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            console.log('Form submitted securely:', formData);
+            
+            setSubmitStatus({ 
+                type: 'success', 
+                message: 'Votre message a été envoyé avec succès ! Nous vous recontacterons rapidement.' 
+            });
+            
+            // Reset form
+            setFormData({
+                nom: '',
+                prenom: '',
+                email: '',
+                telephone: '',
+                entreprise: '',
+                service: '',
+                message: ''
+            });
+        } catch (error) {
+            setSubmitStatus({ 
+                type: 'error', 
+                message: 'Une erreur est survenue. Veuillez réessayer.' 
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -174,6 +273,22 @@ const Contact = () => {
                                             Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les plus brefs délais.
                                         </p>
                                     </div>
+
+                                    {/* Status Message */}
+                                    {submitStatus && (
+                                        <div style={{
+                                            padding: '16px',
+                                            borderRadius: '12px',
+                                            marginBottom: '24px',
+                                            backgroundColor: submitStatus.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 51, 51, 0.1)',
+                                            border: `1px solid ${submitStatus.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 51, 51, 0.3)'}`,
+                                            color: submitStatus.type === 'success' ? '#10b981' : '#ff3333',
+                                            textAlign: 'center',
+                                            fontSize: '0.95rem'
+                                        }}>
+                                            {submitStatus.message}
+                                        </div>
+                                    )}
 
                                     <div style={{ 
                                         display: 'grid', 

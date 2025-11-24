@@ -1,16 +1,54 @@
-# React + Vite
+# Sysgate Security - Cybersécurité & Protection
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site web professionnel pour Sysgate Security, expert en cybersécurité basé à Paris.
 
-Currently, two official plugins are available:
+## 🛡️ Services
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Infrastructure Sécurisée** - Conception et optimisation d'architectures réseaux résilientes
+- **Pentest** - Tests d'intrusion White, Grey et Black Box
+- **Audit de Sécurité** - Analyse approfondie pour évaluer les risques
+- **Intégration de Solutions** - Déploiement de technologies de pointe (SOAR, SIEM, EDR)
 
-## React Compiler
+## 🚀 Technologies
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 18** - Framework JavaScript moderne
+- **Vite** - Build tool ultra-rapide
+- **Framer Motion** - Animations fluides
+- **React Router** - Navigation SPA
+- **React Icons** - Bibliothèque d'icônes
 
-## Expanding the ESLint configuration
+## 📦 Installation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## 🔍 SEO
+
+Le site est optimisé pour le référencement avec :
+- Meta tags complets (Open Graph, Twitter Card)
+- Données structurées Schema.org
+- Sitemap.xml
+- Robots.txt
+- URLs canoniques
+- Balises sémantiques HTML5
+
+## 📱 Responsive
+
+Design entièrement responsive optimisé pour :
+- Desktop (1920px+)
+- Tablette (768px - 1024px)
+- Mobile (320px - 767px)
+
+## 🎨 Design System
+
+- **Couleurs principales** :
+  - Violet (#6d28d9) - Intégration
+  - Vert (#10b981) - Infrastructure
+  - Rouge (#ff3333) - Pentest
+  - Jaune (#fbbf24) - Audit
+
+## 📄 License
+
+© 2025 Sysgate Security. Tous droits réservés.

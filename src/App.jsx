@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Infrastructure from './pages/Infrastructure';
 import Pentest from './pages/Pentest';
@@ -31,6 +32,7 @@ const AnimatedRoutes = () => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="app">
         <Navbar />
         <main style={{ minHeight: 'calc(100vh - 300px)' }}>

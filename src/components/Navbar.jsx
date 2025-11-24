@@ -7,6 +7,7 @@ const Navbar = () => {
     const location = useLocation();
     const [scrolled, setScrolled] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [servicesOpen, setServicesOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -182,92 +183,99 @@ const Navbar = () => {
                                 overflowY: 'auto'
                             }}
                         >
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {services.map((service, index) => (
-                                    <motion.div 
-                                        key={service.name} 
-                                        variants={linkVariants}
-                                        whileTap={{ scale: 0.98 }}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {/* Services Section */}
+                                <motion.div variants={linkVariants}>
+                                    <div
+                                        onClick={() => setServicesOpen(!servicesOpen)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '18px 20px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            fontSize: '1rem',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            border: '1px solid rgba(255,255,255,0.08)',
+                                            transition: 'all 0.3s ease'
+                                        }}
                                     >
-                                        <Link
-                                            to={service.path}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                padding: '22px 24px',
-                                                background: location.pathname === service.path 
-                                                    ? `linear-gradient(135deg, ${getHoverColor(service.name)}15, ${getHoverColor(service.name)}08)` 
-                                                    : 'rgba(255,255,255,0.04)',
-                                                borderRadius: '16px',
-                                                color: 'white',
-                                                fontSize: '1.1rem',
-                                                fontWeight: '600',
-                                                textDecoration: 'none',
-                                                border: location.pathname === service.path 
-                                                    ? `2px solid ${getHoverColor(service.name)}40` 
-                                                    : '2px solid rgba(255,255,255,0.06)',
-                                                boxShadow: location.pathname === service.path 
-                                                    ? `0 8px 24px ${getHoverColor(service.name)}20` 
-                                                    : '0 4px 12px rgba(0,0,0,0.2)',
-                                                transition: 'all 0.3s ease'
-                                            }}
-                                            onClick={() => {
-                                                setIsOpen(false);
-                                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                                            }}
-                                        >
-                                            <span style={{ 
-                                                color: location.pathname === service.path ? getHoverColor(service.name) : 'white',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '12px'
-                                            }}>
-                                                <span style={{
-                                                    width: '6px',
-                                                    height: '6px',
-                                                    borderRadius: '50%',
-                                                    backgroundColor: location.pathname === service.path ? getHoverColor(service.name) : 'rgba(255,255,255,0.3)'
-                                                }} />
-                                                {service.name}
-                                            </span>
-                                            <FaChevronRight 
-                                                size={16} 
-                                                style={{ 
-                                                    color: location.pathname === service.path ? getHoverColor(service.name) : 'var(--color-text-muted)',
-                                                    opacity: 0.6
-                                                }} 
-                                            />
-                                        </Link>
-                                    </motion.div>
-                                ))}
-                            </div>
+                                        <span>Services</span>
+                                        <FaChevronRight 
+                                            size={14} 
+                                            style={{ 
+                                                transform: servicesOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                                                transition: 'transform 0.3s ease',
+                                                opacity: 0.6
+                                            }} 
+                                        />
+                                    </div>
+                                    
+                                    {/* Services Dropdown */}
+                                    <AnimatePresence>
+                                        {servicesOpen && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                style={{ overflow: 'hidden', marginTop: '8px' }}
+                                            >
+                                                {services.map((service) => (
+                                                    <Link
+                                                        key={service.name}
+                                                        to={service.path}
+                                                        style={{
+                                                            display: 'block',
+                                                            padding: '14px 20px 14px 32px',
+                                                            color: location.pathname === service.path ? getHoverColor(service.name) : 'var(--color-text-secondary)',
+                                                            fontSize: '0.95rem',
+                                                            textDecoration: 'none',
+                                                            borderLeft: location.pathname === service.path ? `3px solid ${getHoverColor(service.name)}` : '3px solid transparent',
+                                                            transition: 'all 0.2s ease'
+                                                        }}
+                                                        onClick={() => {
+                                                            setIsOpen(false);
+                                                            setServicesOpen(false);
+                                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                        }}
+                                                    >
+                                                        {service.name}
+                                                    </Link>
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
 
-                            <motion.div variants={linkVariants} style={{ marginTop: '30px' }}>
-                                <Link 
-                                    to="/contact" 
-                                    className="btn" 
-                                    style={{ 
-                                        width: '100%', 
-                                        display: 'block',
-                                        textAlign: 'center', 
-                                        padding: '16px 24px',
-                                        fontSize: '1rem',
-                                        fontWeight: '600',
-                                        borderRadius: '16px',
-                                        background: 'rgba(255,255,255,0.08)',
-                                        color: 'white',
-                                        border: '2px solid rgba(255,255,255,0.15)',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                                    }}
-                                    onClick={() => {
-                                        setIsOpen(false);
-                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                    }}
-                                >
-                                    Nous Contacter
-                                </Link>
-                            </motion.div>
+                                {/* Contact Link */}
+                                <motion.div variants={linkVariants}>
+                                    <Link 
+                                        to="/contact" 
+                                        style={{ 
+                                            display: 'block',
+                                            padding: '18px 20px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            fontSize: '1rem',
+                                            fontWeight: '600',
+                                            textDecoration: 'none',
+                                            border: '1px solid rgba(255,255,255,0.08)',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                    >
+                                        Contact
+                                    </Link>
+                                </motion.div>
+                            </div>
                             
                             <motion.div variants={linkVariants} style={{ marginTop: 'auto', paddingTop: '40px', paddingBottom: '40px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                                 <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', opacity: 0.7 }}>© 2025 Sysgate Security</p>

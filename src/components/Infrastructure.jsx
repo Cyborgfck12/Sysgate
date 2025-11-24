@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaSearch, FaDraftingCompass, FaCogs, FaUsers, FaTools } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const Infrastructure = () => {
     const accentColor = '#10b981'; // Emerald 500 - Subtle Green
@@ -72,16 +73,23 @@ const Infrastructure = () => {
                                     Tout au long du processus, nous vous fournissons des rapports réguliers sur l’état d’avancement, les résultats obtenus et les éventuels défis rencontrés. Nous adoptons une approche collaborative et agile, vous impliquant activement à chaque étape pour garantir une solution sur mesure parfaitement alignée avec vos attentes et vos objectifs.
                                 </p>
                                 <div style={{ marginTop: '40px' }}>
-                                    <a href="/contact" className="btn" style={{ 
-                                        backgroundColor: accentColor, 
-                                        color: 'white',
-                                        border: 'none',
-                                        boxShadow: `0 0 15px ${accentColor}40`,
-                                        display: 'inline-block',
-                                        textDecoration: 'none'
-                                    }}>
-                                        Nous contacter
-                                    </a>
+                                    <Link to='/contact' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className='btn btn-primary' 
+                                            style={{ 
+                                                padding: '12px 24px', 
+                                                fontSize: '1rem',
+                                                backgroundColor: accentColor,
+                                                borderColor: accentColor,
+                                                borderRadius: '9999px',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Demander un devis
+                                        </motion.button>
+                                    </Link>
                                 </div>
                             </div>
                             

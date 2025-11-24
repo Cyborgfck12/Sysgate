@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaNetworkWired, FaFolderOpen, FaCode, FaFileAlt, FaUsers, FaCheckCircle } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const AuditIntegration = () => {
     const accentColor = '#fbbf24'; // Amber/Yellow
@@ -127,19 +128,24 @@ const AuditIntegration = () => {
                         </div>
 
                         <div style={{ textAlign: 'center', marginTop: '50px' }}>
-                            <a href="/contact" className="btn" style={{ 
-                                backgroundColor: accentColor, 
-                                color: '#1c1822',
-                                border: 'none',
-                                padding: '14px 32px',
-                                fontSize: '1rem',
-                                fontWeight: '700',
-                                boxShadow: `0 0 20px ${accentColor}40`,
-                                display: 'inline-block',
-                                textDecoration: 'none'
-                            }}>
-                                Nous contacter
-                            </a>
+                            <Link to='/contact' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className='btn btn-primary' 
+                                    style={{ 
+                                        padding: '12px 24px', 
+                                        fontSize: '1rem',
+                                        backgroundColor: accentColor,
+                                        borderColor: accentColor,
+                                        color: '#1c1822',
+                                        borderRadius: '9999px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Demander un devis
+                                </motion.button>
+                            </Link>
                         </div>
                     </div>
 

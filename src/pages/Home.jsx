@@ -3,6 +3,7 @@ import Hero from '../components/Hero';
 import Services from '../components/Services';
 import About from '../components/About';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
     return (
@@ -22,9 +23,14 @@ const Home = () => {
                     <p style={{ color: 'var(--color-text-secondary)', marginBottom: '20px' }}>
                         Parlez-nous de vos enjeux sécurité. Nous revenons vers vous rapidement.
                     </p>
-                    <a href="#contact" className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '0.95rem' }}>
+                    <Link 
+                        to="/contact" 
+                        className="btn btn-primary" 
+                        style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    >
                         Nous contacter
-                    </a>
+                    </Link>
                 </div>
             </section>
         </motion.div>

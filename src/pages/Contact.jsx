@@ -134,19 +134,46 @@ const Contact = () => {
                             transition={{ duration: 0.6 }}
                         >
                             <div style={{
-                                background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))',
+                                background: 'linear-gradient(135deg, rgba(109, 40, 217, 0.08), rgba(109, 40, 217, 0.02))',
                                 padding: '2px',
-                                borderRadius: '16px'
+                                borderRadius: '20px',
+                                boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
                             }}>
                                 <form onSubmit={handleSubmit} style={{
-                                    backgroundColor: 'var(--color-bg-secondary)',
-                                    borderRadius: '14px',
-                                    padding: isMobile ? '24px' : '40px',
-                                    border: '1px solid rgba(255, 255, 255, 0.08)'
+                                    backgroundColor: 'rgba(28, 24, 34, 0.95)',
+                                    borderRadius: '18px',
+                                    padding: isMobile ? '32px 24px' : '50px 40px',
+                                    border: '1px solid rgba(109, 40, 217, 0.12)',
+                                    backdropFilter: 'blur(20px)'
                                 }}>
-                                    <h4 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', marginBottom: '24px' }}>
-                                        Envoyez-nous un message
-                                    </h4>
+                                    {/* Logo et titre */}
+                                    <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                                        <img 
+                                            src="/Image/logl12.webp" 
+                                            alt="Sysgate Logo" 
+                                            style={{ 
+                                                height: '60px', 
+                                                width: 'auto',
+                                                marginBottom: '20px'
+                                            }} 
+                                        />
+                                        <h4 style={{ 
+                                            fontSize: '1.8rem', 
+                                            fontWeight: 800, 
+                                            color: 'white', 
+                                            marginBottom: '8px',
+                                            letterSpacing: '-0.5px'
+                                        }}>
+                                            Demande de Contact
+                                        </h4>
+                                        <p style={{ 
+                                            color: 'var(--color-text-secondary)', 
+                                            fontSize: '0.95rem',
+                                            lineHeight: '1.5'
+                                        }}>
+                                            Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les plus brefs délais.
+                                        </p>
+                                    </div>
 
                                     <div style={{ 
                                         display: 'grid', 
@@ -177,15 +204,24 @@ const Contact = () => {
                                         required
                                         style={{
                                             width: '100%',
-                                            padding: '14px 16px',
-                                            backgroundColor: 'var(--color-bg-primary)',
-                                            border: '1px solid var(--color-border)',
-                                            borderRadius: '8px',
+                                            padding: '16px 18px',
+                                            backgroundColor: 'rgba(255,255,255,0.03)',
+                                            border: '1px solid rgba(109, 40, 217, 0.15)',
+                                            borderRadius: '12px',
                                             color: formData.service ? 'white' : 'var(--color-text-muted)',
-                                            fontSize: '16px', // No zoom iOS
+                                            fontSize: '16px',
                                             marginBottom: '16px',
                                             outline: 'none',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        onFocus={(e) => {
+                                            e.target.style.borderColor = 'rgba(109, 40, 217, 0.5)';
+                                            e.target.style.backgroundColor = 'rgba(109, 40, 217, 0.05)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.target.style.borderColor = 'rgba(109, 40, 217, 0.15)';
+                                            e.target.style.backgroundColor = 'rgba(255,255,255,0.03)';
                                         }}
                                     >
                                         <option value="">Service souhaité *</option>
@@ -203,35 +239,73 @@ const Contact = () => {
                                         onChange={handleChange}
                                         style={{
                                             width: '100%',
-                                            padding: '14px 16px',
-                                            backgroundColor: 'var(--color-bg-primary)',
-                                            border: '1px solid var(--color-border)',
-                                            borderRadius: '8px',
+                                            padding: '16px 18px',
+                                            backgroundColor: 'rgba(255,255,255,0.03)',
+                                            border: '1px solid rgba(109, 40, 217, 0.15)',
+                                            borderRadius: '12px',
                                             color: 'white',
-                                            fontSize: '16px', // No zoom iOS
-                                            marginBottom: '24px',
+                                            fontSize: '16px',
+                                            marginBottom: '28px',
                                             outline: 'none',
                                             resize: 'vertical',
-                                            fontFamily: 'inherit'
+                                            fontFamily: 'inherit',
+                                            transition: 'all 0.3s ease',
+                                            minHeight: '140px'
+                                        }}
+                                        onFocus={(e) => {
+                                            e.target.style.borderColor = 'rgba(109, 40, 217, 0.5)';
+                                            e.target.style.backgroundColor = 'rgba(109, 40, 217, 0.05)';
+                                            e.target.style.boxShadow = '0 0 0 3px rgba(109, 40, 217, 0.08)';
+                                        }}
+                                        onBlur={(e) => {
+                                            e.target.style.borderColor = 'rgba(109, 40, 217, 0.15)';
+                                            e.target.style.backgroundColor = 'rgba(255,255,255,0.03)';
+                                            e.target.style.boxShadow = 'none';
                                         }}
                                     />
 
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                        style={{
-                                            width: '100%',
-                                            padding: '16px',
-                                            fontSize: '1rem',
-                                            fontWeight: 600,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '10px'
-                                        }}
-                                    >
-                                        <FaPaperPlane /> Envoyer le message
-                                    </button>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <button
+                                            type="submit"
+                                            className="btn"
+                                            style={{
+                                                padding: '12px 28px',
+                                                fontSize: '0.95rem',
+                                                fontWeight: 600,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '10px',
+                                                background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary))',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '9999px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                                boxShadow: '0 4px 12px rgba(109, 40, 217, 0.25)'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.target.style.transform = 'translateY(-2px)';
+                                                e.target.style.boxShadow = '0 8px 20px rgba(109, 40, 217, 0.35)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.target.style.transform = 'translateY(0)';
+                                                e.target.style.boxShadow = '0 4px 12px rgba(109, 40, 217, 0.25)';
+                                            }}
+                                        >
+                                            <FaPaperPlane /> Envoyer le message
+                                        </button>
+                                    </div>
+                                    
+                                    <p style={{ 
+                                        textAlign: 'center', 
+                                        marginTop: '20px', 
+                                        color: 'var(--color-text-muted)', 
+                                        fontSize: '0.85rem',
+                                        lineHeight: '1.5'
+                                    }}>
+                                        En soumettant ce formulaire, vous acceptez que vos données soient utilisées pour vous recontacter.
+                                    </p>
                                 </form>
                             </div>
                         </motion.div>
@@ -279,15 +353,26 @@ const Input = ({ style, ...props }) => (
     <input
         {...props}
         style={{
-            padding: '14px 16px',
-            backgroundColor: 'var(--color-bg-primary)',
-            border: '1px solid var(--color-border)',
-            borderRadius: '8px',
+            padding: '16px 18px',
+            backgroundColor: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(109, 40, 217, 0.15)',
+            borderRadius: '12px',
             color: 'white',
-            fontSize: '16px', // No zoom iOS
+            fontSize: '16px',
             outline: 'none',
             width: '100%',
+            transition: 'all 0.3s ease',
             ...style
+        }}
+        onFocus={(e) => {
+            e.target.style.borderColor = 'rgba(109, 40, 217, 0.5)';
+            e.target.style.backgroundColor = 'rgba(109, 40, 217, 0.05)';
+            e.target.style.boxShadow = '0 0 0 3px rgba(109, 40, 217, 0.08)';
+        }}
+        onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(109, 40, 217, 0.15)';
+            e.target.style.backgroundColor = 'rgba(255,255,255,0.03)';
+            e.target.style.boxShadow = 'none';
         }}
     />
 );

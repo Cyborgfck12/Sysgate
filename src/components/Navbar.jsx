@@ -84,7 +84,11 @@ const Navbar = () => {
         >
             <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                 {/* Left: Logo */}
-                <Link to="/" style={{ display: 'flex', alignItems: 'center', zIndex: 1002, position: 'absolute', left: '20px' }}>
+                <Link 
+                    to="/" 
+                    style={{ display: 'flex', alignItems: 'center', zIndex: 1002, position: 'absolute', left: '20px' }}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                >
                     <img src="/Image/logl12.webp" alt="Sysgate Logo" style={{ height: scrolled || isOpen ? '65px' : '80px', width: 'auto', transition: 'height 0.3s ease' }} />
                 </Link>
 

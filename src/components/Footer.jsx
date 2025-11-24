@@ -153,6 +153,7 @@ const Footer = () => {
                                             alignItems: 'center',
                                             gap: '8px'
                                         }}
+                                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                                         onMouseEnter={(e) => e.target.style.color = service.color}
                                         onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
                                     >
@@ -204,37 +205,11 @@ const Footer = () => {
                     borderTop: '1px solid rgba(255,255,255,0.06)', 
                     paddingTop: '30px',
                     paddingBottom: '30px',
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    flexWrap: 'wrap', 
-                    gap: '20px' 
+                    textAlign: 'center'
                 }}>
                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                         © 2025 Sysgate Security. Tous droits réservés.
                     </p>
-                    <div style={{ display: 'flex', gap: '24px', fontSize: '0.9rem' }}>
-                        <a href="#" style={{ 
-                            color: 'var(--color-text-muted)', 
-                            textDecoration: 'none',
-                            transition: 'color 0.3s ease'
-                        }}
-                        onMouseEnter={(e) => e.target.style.color = 'white'}
-                        onMouseLeave={(e) => e.target.style.color = 'var(--color-text-muted)'}
-                        >
-                            Mentions légales
-                        </a>
-                        <a href="#" style={{ 
-                            color: 'var(--color-text-muted)', 
-                            textDecoration: 'none',
-                            transition: 'color 0.3s ease'
-                        }}
-                        onMouseEnter={(e) => e.target.style.color = 'white'}
-                        onMouseLeave={(e) => e.target.style.color = 'var(--color-text-muted)'}
-                        >
-                            Politique de confidentialité
-                        </a>
-                    </div>
                 </div>
             </div>
         </footer>

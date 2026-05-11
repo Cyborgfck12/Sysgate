@@ -220,8 +220,8 @@ const Contact = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                                 {/* Items coordonnées... identique */}
                                 <ContactInfoItem icon={<FaEnvelope />} label="Email" value="contact@sysgate.com" />
-                                <ContactInfoItem icon={<FaPhone />} label="Téléphone" value="+33 1 23 45 67 89" />
-                                <ContactInfoItem icon={<FaMapMarkerAlt />} label="Adresse" value="Paris, France" />
+                                <ContactInfoItem icon={<FaPhone />} label="Téléphone" value="07 85 84 05 40" />
+                                <ContactInfoItem icon={<FaMapMarkerAlt />} label="Adresse" value="155 chemin du Rayol, 83490 Le Muy" />
                             </div>
                         </motion.div>
 

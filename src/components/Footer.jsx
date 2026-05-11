@@ -190,11 +190,11 @@ const Footer = () => {
                             </li>
                             <li style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
                                 <FaPhone style={{ color: 'var(--color-accent-primary)', marginTop: '4px', fontSize: '0.9rem' }} />
-                                <span style={{ color: 'var(--color-text-secondary)' }}>+33 1 23 45 67 89</span>
+                                <span style={{ color: 'var(--color-text-secondary)' }}>07 85 84 05 40</span>
                             </li>
                             <li style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
                                 <FaMapMarkerAlt style={{ color: 'var(--color-accent-primary)', marginTop: '4px', fontSize: '0.9rem' }} />
-                                <span style={{ color: 'var(--color-text-secondary)' }}>Paris, France</span>
+                                <span style={{ color: 'var(--color-text-secondary)' }}>155 chemin du Rayol, 83490 Le Muy</span>
                             </li>
                         </ul>
                     </div>

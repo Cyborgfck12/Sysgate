@@ -32,7 +32,7 @@ const Contact = () => {
                                 </div>
                                 <div>
                                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Téléphone</p>
-                                    <p style={{ color: 'white', fontWeight: 'bold' }}>+33 1 23 45 67 89</p>
+                                    <p style={{ color: 'white', fontWeight: 'bold' }}>07 85 84 05 40</p>
                                 </div>
                             </div>
 
@@ -42,7 +42,7 @@ const Contact = () => {
                                 </div>
                                 <div>
                                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Adresse</p>
-                                    <p style={{ color: 'white', fontWeight: 'bold' }}>Paris, France</p>
+                                    <p style={{ color: 'white', fontWeight: 'bold' }}>155 chemin du Rayol, 83490 Le Muy</p>
                                 </div>
                             </div>
                         </div>

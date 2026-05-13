@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
 import { useResponsive } from '../hooks/useResponsive'; // Assurez-vous que ce hook existe
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
     const { isMobile } = useResponsive();
@@ -31,8 +32,7 @@ const Contact = () => {
     // Sanitize input to prevent XSS
     const sanitizeInput = (input) => {
         return input
-            .replace(/[<>]/g, '') // Remove < and >
-            .trim();
+            .replace(/[<>]/g, ''); // Remove < and >
     };
 
     // Validate email format
@@ -105,10 +105,20 @@ const Contact = () => {
         setSubmitStatus(null);
 
         try {
-            // Simulate API call (replace with actual endpoint)
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            console.log('Form submitted securely:', formData);
+            await emailjs.send(
+                'service_p56pta4',
+                'template_jjnyok7',
+                {
+                    nom: formData.nom,
+                    prenom: formData.prenom,
+                    email: formData.email,
+                    telephone: formData.telephone || 'Non renseigné',
+                    entreprise: formData.entreprise || 'Non renseignée',
+                    service: formData.service,
+                    message: formData.message
+                },
+                '7GjEYjcq9yQBbk-zC'
+            );
             
             setSubmitStatus({ 
                 type: 'success', 
@@ -320,7 +330,7 @@ const Contact = () => {
                                         style={{
                                             width: '100%',
                                             padding: '16px 18px',
-                                            backgroundColor: 'rgba(255,255,255,0.03)',
+                                            backgroundColor: '#1c1822',
                                             border: '1px solid rgba(109, 40, 217, 0.15)',
                                             borderRadius: '12px',
                                             color: formData.service ? 'white' : 'var(--color-text-muted)',
@@ -328,20 +338,27 @@ const Contact = () => {
                                             marginBottom: '16px',
                                             outline: 'none',
                                             cursor: 'pointer',
-                                            transition: 'all 0.3s ease'
+                                            transition: 'all 0.3s ease',
+                                            appearance: 'none',
+                                            WebkitAppearance: 'none',
+                                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                                            backgroundRepeat: 'no-repeat',
+                                            backgroundPosition: 'right 16px center'
                                         }}
                                         onFocus={(e) => {
                                             e.target.style.borderColor = 'rgba(109, 40, 217, 0.5)';
-                                            e.target.style.backgroundColor = 'rgba(109, 40, 217, 0.05)';
+                                            e.target.style.backgroundColor = 'rgba(109, 40, 217, 0.08)';
+                                            e.target.style.boxShadow = '0 0 0 3px rgba(109, 40, 217, 0.08)';
                                         }}
                                         onBlur={(e) => {
                                             e.target.style.borderColor = 'rgba(109, 40, 217, 0.15)';
-                                            e.target.style.backgroundColor = 'rgba(255,255,255,0.03)';
+                                            e.target.style.backgroundColor = '#1c1822';
+                                            e.target.style.boxShadow = 'none';
                                         }}
                                     >
-                                        <option value="">Service souhaité *</option>
+                                        <option value="" style={{ backgroundColor: '#1c1822', color: '#9ca3af' }}>Service souhaité *</option>
                                         {services.map((service, index) => (
-                                            <option key={index} value={service}>{service}</option>
+                                            <option key={index} value={service} style={{ backgroundColor: '#1c1822', color: '#ffffff', padding: '12px' }}>{service}</option>
                                         ))}
                                     </select>
 

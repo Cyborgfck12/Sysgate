@@ -176,6 +176,19 @@ ul { list-style: none; }
     }
 }
 
+/* Select & Option dark theme */
+select, select option {
+    background-color: #1c1822 !important;
+    color: #ffffff !important;
+}
+select option:checked {
+    background-color: #6d28d9 !important;
+    color: #ffffff !important;
+}
+select option:hover {
+    background-color: rgba(109, 40, 217, 0.3) !important;
+}
+
 /* PETIT MOBILE (max-width: 480px) */
 @media (max-width: 480px) {
     .hero-section { padding-top: 110px; }

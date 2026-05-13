@@ -223,10 +223,34 @@ const Contact = () => {
                 message: ''
             });
         } catch (error) {
-            setSubmitStatus({ 
-                type: 'error', 
-                message: 'Une erreur est survenue. Veuillez réessayer.' 
-            });
+            // Determine the user-facing message based on the actual failure.
+            const status = error?.status;
+            const text = (error?.text || error?.message || '').toLowerCase();
+            let message;
+
+            if (!navigator.onLine) {
+                message = 'Pas de connexion internet. Vérifiez votre réseau et réessayez.';
+            } else if (status === 0 || text.includes('network') || text.includes('failed to fetch')) {
+                message = 'Connexion au serveur impossible. Vérifiez votre connexion internet.';
+            } else if (status === 400) {
+                message = 'Certaines informations du formulaire sont invalides. Vérifiez vos champs.';
+            } else if (status === 401 || status === 403) {
+                message = "Service d'envoi temporairement indisponible. Réessayez dans quelques minutes.";
+            } else if (status === 412 || text.includes('smtp') || text.includes('authentication')) {
+                message = "Le serveur mail est temporairement indisponible. Réessayez plus tard ou contactez-nous directement à j.borri@sysgate.io.";
+            } else if (status === 426 || text.includes('quota') || text.includes('limit')) {
+                message = "Quota d'envoi atteint pour aujourd'hui. Réessayez demain ou écrivez directement à j.borri@sysgate.io.";
+            } else if (status === 429) {
+                message = 'Trop de tentatives. Patientez quelques minutes avant de réessayer.';
+            } else if (status >= 500 && status < 600) {
+                message = 'Le serveur rencontre un problème. Réessayez dans quelques minutes.';
+            } else if (text.includes('timeout')) {
+                message = 'La requête a pris trop de temps. Vérifiez votre connexion et réessayez.';
+            } else {
+                message = "L'envoi a échoué. Réessayez ou écrivez directement à j.borri@sysgate.io.";
+            }
+
+            setSubmitStatus({ type: 'error', message });
         } finally {
             setIsSubmitting(false);
         }

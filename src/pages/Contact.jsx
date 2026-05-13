@@ -178,14 +178,9 @@ const Contact = () => {
             return;
         }
 
-        const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-        const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-        const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-        if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-            setSubmitStatus({ type: 'error', message: "Configuration d'envoi manquante. Contactez l'administrateur." });
-            return;
-        }
+        const SERVICE_ID = 'service_p56pta4';
+        const TEMPLATE_ID = 'template_jjnyok7';
+        const PUBLIC_KEY = '7GjEYjcq9yQBbk-zC';
 
         setIsSubmitting(true);
         setSubmitStatus(null);

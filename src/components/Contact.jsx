@@ -22,7 +22,7 @@ const Contact = () => {
                                 </div>
                                 <div>
                                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Email</p>
-                                    <p style={{ color: 'white', fontWeight: 'bold' }}>contact@sysgate.com</p>
+                                    <p style={{ color: 'white', fontWeight: 'bold' }}>j.borri@sysgate.io</p>
                                 </div>
                             </div>
 

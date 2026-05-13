@@ -8,4 +8,9 @@ export default defineConfig({
     historyApiFallback: true,
   },
   appType: 'spa',
+  build: {
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'es2018',
+  },
 })

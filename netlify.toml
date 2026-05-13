@@ -1,0 +1,48 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback for React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers applied to every response
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Anti-clickjacking
+    X-Frame-Options = "DENY"
+    # Block MIME-type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Limit referrer information leaked to other origins
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Disable features the site does not need
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()"
+    # Force HTTPS for the next year, including subdomains
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    # Cross-origin isolation hardening
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-origin"
+    X-XSS-Protection = "0"
+    # Content Security Policy
+    # - default-src 'self' : everything is same-origin unless explicitly allowed
+    # - script-src : Vite-built assets are self-hosted; no inline scripts permitted
+    # - style-src : 'unsafe-inline' is required because the codebase uses inline styles;
+    #   we still restrict origins to self + Google Fonts
+    # - connect-src : EmailJS API + Google Fonts
+    # - frame-ancestors 'none' : redundant with X-Frame-Options for modern browsers
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api.emailjs.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+
+# Long-term caching for hashed assets emitted by Vite
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Never cache the entry HTML so security headers stay fresh
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"

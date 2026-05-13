@@ -48,7 +48,7 @@ const Footer = () => {
                             Votre partenaire de confiance en cybersécurité. Nous protégeons votre entreprise contre les menaces numériques avec expertise et innovation.
                         </p>
                         <div style={{ display: 'flex', gap: '16px' }}>
-                            <a href="#" style={{
+                            <a href="#" rel="noopener noreferrer" aria-label="LinkedIn" style={{
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '50%',
@@ -73,7 +73,7 @@ const Footer = () => {
                             >
                                 <FaLinkedin size={18} />
                             </a>
-                            <a href="#" style={{
+                            <a href="#" rel="noopener noreferrer" aria-label="Twitter" style={{
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '50%',
@@ -98,7 +98,7 @@ const Footer = () => {
                             >
                                 <FaTwitter size={18} />
                             </a>
-                            <a href="#" style={{
+                            <a href="#" rel="noopener noreferrer" aria-label="GitHub" style={{
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '50%',
@@ -177,7 +177,7 @@ const Footer = () => {
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <li style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
                                 <FaEnvelope style={{ color: 'var(--color-accent-primary)', marginTop: '4px', fontSize: '0.9rem' }} />
-                                <a href="mailto:contact@sysgate.com" style={{ 
+                                <a href="mailto:j.borri@sysgate.io" style={{ 
                                     color: 'var(--color-text-secondary)',
                                     textDecoration: 'none',
                                     transition: 'color 0.3s ease'
@@ -185,7 +185,7 @@ const Footer = () => {
                                 onMouseEnter={(e) => e.target.style.color = 'white'}
                                 onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
                                 >
-                                    contact@sysgate.com
+                                    j.borri@sysgate.io
                                 </a>
                             </li>
                             <li style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>

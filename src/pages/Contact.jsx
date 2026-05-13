@@ -1,8 +1,22 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
 import { useResponsive } from '../hooks/useResponsive'; // Assurez-vous que ce hook existe
 import emailjs from '@emailjs/browser';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import {
+    FIELD_LIMITS,
+    sanitizeField,
+    containsSuspiciousContent,
+    isValidEmail,
+    isDisposableEmail,
+    isValidName,
+    isValidCompany,
+    isLikelyLinkSpam,
+    checkRateLimit,
+    registerSubmission,
+} from '../utils/security';
 
 const Contact = () => {
     const { isMobile } = useResponsive();
@@ -20,6 +34,13 @@ const Contact = () => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null);
+    const [hasSent, setHasSent] = useState(false);
+    // Honeypot field: real users never fill this hidden input.
+    // Bots typically fill every field, which lets us silently drop submissions.
+    const honeypotRef = useRef(null);
+    // Track when the form was first rendered. Submissions completed in < 2s
+    // are almost certainly automated.
+    const renderedAtRef = useRef(Date.now());
 
     const services = [
         'Infrastructure Sécurisée',
@@ -29,75 +50,140 @@ const Contact = () => {
         'Autre'
     ];
 
-    // Sanitize input to prevent XSS
-    const sanitizeInput = (input) => {
-        return input
-            .replace(/[<>]/g, ''); // Remove < and >
-    };
-
-    // Validate email format
-    const validateEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
-    // Validate phone format (French)
+    // Validate phone format (international, E.164)
     const validatePhone = (phone) => {
         if (!phone) return true; // Optional field
-        const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-        return phoneRegex.test(phone.replace(/\s/g, ''));
+        return isValidPhoneNumber(phone);
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        const sanitizedValue = sanitizeInput(value);
-        
-        setFormData({
-            ...formData,
-            [name]: sanitizedValue
-        });
+        const max = FIELD_LIMITS[name] ?? 500;
+        const cleanValue = sanitizeField(value, max);
 
-        // Clear error for this field
+        setFormData((prev) => ({
+            ...prev,
+            [name]: cleanValue,
+        }));
+
         if (errors[name]) {
-            setErrors({
-                ...errors,
-                [name]: ''
-            });
+            setErrors((prev) => ({ ...prev, [name]: '' }));
         }
     };
 
     const validateForm = () => {
         const newErrors = {};
 
-        // Required fields
-        if (!formData.nom.trim()) newErrors.nom = 'Le nom est requis';
-        if (!formData.prenom.trim()) newErrors.prenom = 'Le prénom est requis';
-        if (!formData.email.trim()) {
-            newErrors.email = 'L\'email est requis';
-        } else if (!validateEmail(formData.email)) {
-            newErrors.email = 'Email invalide';
-        }
-        if (!formData.service) newErrors.service = 'Veuillez sélectionner un service';
-        if (!formData.message.trim()) {
-            newErrors.message = 'Le message est requis';
-        } else if (formData.message.length < 10) {
-            newErrors.message = 'Le message doit contenir au moins 10 caractères';
+        // Nom
+        if (!formData.nom.trim()) {
+            newErrors.nom = 'Le nom est requis';
+        } else if (!isValidName(formData.nom)) {
+            newErrors.nom = 'Nom invalide (lettres, espaces, tirets uniquement)';
         }
 
-        // Optional phone validation
+        // Prénom
+        if (!formData.prenom.trim()) {
+            newErrors.prenom = 'Le prénom est requis';
+        } else if (!isValidName(formData.prenom)) {
+            newErrors.prenom = 'Prénom invalide (lettres, espaces, tirets uniquement)';
+        }
+
+        // Email
+        if (!formData.email.trim()) {
+            newErrors.email = "L'email est requis";
+        } else if (!isValidEmail(formData.email)) {
+            newErrors.email = 'Email invalide';
+        } else if (isDisposableEmail(formData.email)) {
+            newErrors.email = 'Les emails jetables ne sont pas acceptés';
+        }
+
+        // Téléphone (optionnel)
         if (formData.telephone && !validatePhone(formData.telephone)) {
             newErrors.telephone = 'Numéro de téléphone invalide';
+        }
+
+        // Entreprise (optionnel)
+        if (formData.entreprise && !isValidCompany(formData.entreprise)) {
+            newErrors.entreprise = "Nom d'entreprise invalide";
+        }
+
+        // Service
+        if (!formData.service) {
+            newErrors.service = 'Veuillez sélectionner un service';
+        } else if (!services.includes(formData.service)) {
+            newErrors.service = 'Service invalide';
+        }
+
+        // Message
+        if (!formData.message.trim()) {
+            newErrors.message = 'Le message est requis';
+        } else if (formData.message.trim().length < 10) {
+            newErrors.message = 'Le message doit contenir au moins 10 caractères';
+        } else if (formData.message.length > FIELD_LIMITS.message) {
+            newErrors.message = `Le message ne doit pas dépasser ${FIELD_LIMITS.message} caractères`;
+        } else if (isLikelyLinkSpam(formData.message)) {
+            newErrors.message = 'Trop de liens détectés dans le message';
+        }
+
+        // Last-line defense against any malformed payload that survived sanitization
+        for (const key of Object.keys(formData)) {
+            if (formData[key] && containsSuspiciousContent(formData[key])) {
+                newErrors[key] = 'Contenu non autorisé détecté';
+            }
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
+    const handlePhoneChange = (value) => {
+        setFormData({ ...formData, telephone: value || '' });
+        if (errors.telephone) {
+            setErrors({ ...errors, telephone: '' });
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
+        if (hasSent || isSubmitting) return;
+
+        // Honeypot: if filled, treat as bot. Pretend success to avoid feedback.
+        if (honeypotRef.current && honeypotRef.current.value) {
+            setHasSent(true);
+            setSubmitStatus({
+                type: 'success',
+                message: 'Votre message a été envoyé avec succès ! Nous vous recontacterons rapidement.',
+            });
+            return;
+        }
+
+        // Time-based bot detection: humans need >2s to fill a form.
+        if (Date.now() - renderedAtRef.current < 2000) {
+            setHasSent(true);
+            setSubmitStatus({
+                type: 'success',
+                message: 'Votre message a été envoyé avec succès ! Nous vous recontacterons rapidement.',
+            });
+            return;
+        }
+
         if (!validateForm()) {
-            setSubmitStatus({ type: 'error', message: 'Veuillez corriger les erreurs dans le formulaire' });
+            return;
+        }
+
+        const rate = checkRateLimit();
+        if (!rate.ok) {
+            setSubmitStatus({ type: 'error', message: rate.reason });
+            return;
+        }
+
+        const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+        const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+        const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+        if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+            setSubmitStatus({ type: 'error', message: "Configuration d'envoi manquante. Contactez l'administrateur." });
             return;
         }
 
@@ -106,20 +192,26 @@ const Contact = () => {
 
         try {
             await emailjs.send(
-                'service_p56pta4',
-                'template_jjnyok7',
+                SERVICE_ID,
+                TEMPLATE_ID,
                 {
-                    nom: formData.nom,
-                    prenom: formData.prenom,
-                    email: formData.email,
-                    telephone: formData.telephone || 'Non renseigné',
-                    entreprise: formData.entreprise || 'Non renseignée',
-                    service: formData.service,
-                    message: formData.message
+                    nom: sanitizeField(formData.nom, FIELD_LIMITS.nom),
+                    prenom: sanitizeField(formData.prenom, FIELD_LIMITS.prenom),
+                    email: sanitizeField(formData.email, FIELD_LIMITS.email),
+                    telephone: formData.telephone
+                        ? sanitizeField(formData.telephone, FIELD_LIMITS.telephone)
+                        : 'Non renseigné',
+                    entreprise: formData.entreprise
+                        ? sanitizeField(formData.entreprise, FIELD_LIMITS.entreprise)
+                        : 'Non renseignée',
+                    service: sanitizeField(formData.service, FIELD_LIMITS.service),
+                    message: sanitizeField(formData.message, FIELD_LIMITS.message),
                 },
-                '7GjEYjcq9yQBbk-zC'
+                PUBLIC_KEY
             );
+            registerSubmission();
             
+            setHasSent(true);
             setSubmitStatus({ 
                 type: 'success', 
                 message: 'Votre message a été envoyé avec succès ! Nous vous recontacterons rapidement.' 
@@ -229,7 +321,7 @@ const Contact = () => {
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                                 {/* Items coordonnées... identique */}
-                                <ContactInfoItem icon={<FaEnvelope />} label="Email" value="contact@sysgate.com" />
+                                <ContactInfoItem icon={<FaEnvelope />} label="Email" value="j.borri@sysgate.io" />
                                 <ContactInfoItem icon={<FaPhone />} label="Téléphone" value="07 85 84 05 40" />
                                 <ContactInfoItem icon={<FaMapMarkerAlt />} label="Adresse" value="155 chemin du Rayol, 83490 Le Muy" />
                             </div>
@@ -300,17 +392,50 @@ const Contact = () => {
                                         </div>
                                     )}
 
-                                    <div style={{ 
-                                        display: 'grid', 
-                                        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
-                                        gap: '16px', 
-                                        marginBottom: '16px' 
-                                    }}>
-                                        <Input name="nom" placeholder="Nom *" value={formData.nom} onChange={handleChange} />
-                                        <Input name="prenom" placeholder="Prénom *" value={formData.prenom} onChange={handleChange} />
+                                    {/* Honeypot anti-bot field. Hidden from real users. */}
+                                    <div
+                                        aria-hidden="true"
+                                        style={{
+                                            position: 'absolute',
+                                            left: '-10000px',
+                                            top: 'auto',
+                                            width: '1px',
+                                            height: '1px',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <label htmlFor="website">Ne pas remplir</label>
+                                        <input
+                                            ref={honeypotRef}
+                                            type="text"
+                                            name="website"
+                                            id="website"
+                                            tabIndex={-1}
+                                            autoComplete="off"
+                                            defaultValue=""
+                                        />
                                     </div>
 
-                                    <Input name="email" type="email" placeholder="Email professionnel *" value={formData.email} onChange={handleChange} style={{ marginBottom: '16px', width: '100%' }} />
+                                    <div style={{ 
+                                        display: 'grid', 
+                                        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
+                                        gap: '16px', 
+                                        marginBottom: '16px' 
+                                    }}>
+                                        <div>
+                                            <Input name="nom" placeholder="Nom *" value={formData.nom} onChange={handleChange} error={errors.nom} maxLength={FIELD_LIMITS.nom} autoComplete="family-name" />
+                                            {errors.nom && <FieldError message={errors.nom} />}
+                                        </div>
+                                        <div>
+                                            <Input name="prenom" placeholder="Prénom *" value={formData.prenom} onChange={handleChange} error={errors.prenom} maxLength={FIELD_LIMITS.prenom} autoComplete="given-name" />
+                                            {errors.prenom && <FieldError message={errors.prenom} />}
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginBottom: '16px' }}>
+                                        <Input name="email" type="email" placeholder="Email professionnel *" value={formData.email} onChange={handleChange} error={errors.email} maxLength={FIELD_LIMITS.email} autoComplete="email" inputMode="email" style={{ width: '100%' }} />
+                                        {errors.email && <FieldError message={errors.email} />}
+                                    </div>
 
                                     <div style={{ 
                                         display: 'grid', 
@@ -318,8 +443,31 @@ const Contact = () => {
                                         gap: '16px', 
                                         marginBottom: '16px' 
                                     }}>
-                                        <Input name="telephone" type="tel" placeholder="Téléphone" value={formData.telephone} onChange={handleChange} />
-                                        <Input name="entreprise" placeholder="Entreprise" value={formData.entreprise} onChange={handleChange} />
+                                        <div>
+                                            <PhoneInput
+                                                international
+                                                defaultCountry="FR"
+                                                value={formData.telephone}
+                                                onChange={handlePhoneChange}
+                                                placeholder="Téléphone"
+                                                className="phone-input-dark"
+                                                style={{
+                                                    padding: '12px 18px',
+                                                    backgroundColor: 'rgba(255,255,255,0.03)',
+                                                    border: errors.telephone ? '1px solid #ff3333' : '1px solid rgba(109, 40, 217, 0.15)',
+                                                    borderRadius: '12px',
+                                                    color: 'white',
+                                                    fontSize: '16px',
+                                                    width: '100%',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                            />
+                                            {errors.telephone && <FieldError message={errors.telephone} />}
+                                        </div>
+                                        <div>
+                                            <Input name="entreprise" placeholder="Entreprise" value={formData.entreprise} onChange={handleChange} error={errors.entreprise} maxLength={FIELD_LIMITS.entreprise} autoComplete="organization" />
+                                            {errors.entreprise && <FieldError message={errors.entreprise} />}
+                                        </div>
                                     </div>
 
                                     <select
@@ -357,18 +505,22 @@ const Contact = () => {
                                         }}
                                     >
                                         <option value="" style={{ backgroundColor: '#1c1822', color: '#9ca3af' }}>Service souhaité *</option>
+                                        {errors.service && null}
                                         {services.map((service, index) => (
                                             <option key={index} value={service} style={{ backgroundColor: '#1c1822', color: '#ffffff', padding: '12px' }}>{service}</option>
                                         ))}
                                     </select>
+                                    {errors.service && <FieldError message={errors.service} />}
 
                                     <textarea
                                         name="message"
                                         placeholder="Décrivez votre projet ou vos besoins *"
                                         required
                                         rows="5"
+                                        maxLength={FIELD_LIMITS.message}
                                         value={formData.message}
                                         onChange={handleChange}
+                                        spellCheck="true"
                                         style={{
                                             width: '100%',
                                             padding: '16px 18px',
@@ -395,11 +547,13 @@ const Contact = () => {
                                             e.target.style.boxShadow = 'none';
                                         }}
                                     />
+                                    {errors.message && <FieldError message={errors.message} />}
 
                                     <div style={{ textAlign: 'center' }}>
                                         <button
                                             type="submit"
                                             className="btn"
+                                            disabled={isSubmitting || hasSent}
                                             style={{
                                                 padding: '12px 28px',
                                                 fontSize: '0.95rem',
@@ -408,24 +562,37 @@ const Contact = () => {
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 gap: '10px',
-                                                background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary))',
+                                                background: hasSent 
+                                                    ? 'linear-gradient(135deg, #10b981, #059669)' 
+                                                    : (isSubmitting ? 'linear-gradient(135deg, #555, #444)' : 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary))'),
                                                 color: 'white',
                                                 border: 'none',
                                                 borderRadius: '9999px',
-                                                cursor: 'pointer',
+                                                cursor: hasSent || isSubmitting ? 'not-allowed' : 'pointer',
                                                 transition: 'all 0.3s ease',
-                                                boxShadow: '0 4px 12px rgba(109, 40, 217, 0.25)'
+                                                boxShadow: hasSent ? '0 4px 12px rgba(16, 185, 129, 0.25)' : '0 4px 12px rgba(109, 40, 217, 0.25)',
+                                                opacity: isSubmitting ? 0.7 : 1
                                             }}
                                             onMouseEnter={(e) => {
-                                                e.target.style.transform = 'translateY(-2px)';
-                                                e.target.style.boxShadow = '0 8px 20px rgba(109, 40, 217, 0.35)';
+                                                if (!hasSent && !isSubmitting) {
+                                                    e.target.style.transform = 'translateY(-2px)';
+                                                    e.target.style.boxShadow = '0 8px 20px rgba(109, 40, 217, 0.35)';
+                                                }
                                             }}
                                             onMouseLeave={(e) => {
-                                                e.target.style.transform = 'translateY(0)';
-                                                e.target.style.boxShadow = '0 4px 12px rgba(109, 40, 217, 0.25)';
+                                                if (!hasSent && !isSubmitting) {
+                                                    e.target.style.transform = 'translateY(0)';
+                                                    e.target.style.boxShadow = '0 4px 12px rgba(109, 40, 217, 0.25)';
+                                                }
                                             }}
                                         >
-                                            <FaPaperPlane /> Envoyer le message
+                                            {hasSent ? (
+                                                <><FaCheckCircle /> Message envoyé</>
+                                            ) : isSubmitting ? (
+                                                <>Envoi en cours...</>
+                                            ) : (
+                                                <><FaPaperPlane /> Envoyer le message</>
+                                            )}
                                         </button>
                                     </div>
                                     
@@ -481,13 +648,25 @@ const ContactInfoItem = ({ icon, label, value }) => (
     </div>
 );
 
-const Input = ({ style, ...props }) => (
+const FieldError = ({ message }) => (
+    <p style={{
+        color: '#ff3333',
+        fontSize: '0.8rem',
+        marginTop: '6px',
+        marginLeft: '4px',
+        fontWeight: 500
+    }}>
+        {message}
+    </p>
+);
+
+const Input = ({ style, error, ...props }) => (
     <input
         {...props}
         style={{
             padding: '16px 18px',
             backgroundColor: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(109, 40, 217, 0.15)',
+            border: error ? '1px solid #ff3333' : '1px solid rgba(109, 40, 217, 0.15)',
             borderRadius: '12px',
             color: 'white',
             fontSize: '16px',
@@ -497,12 +676,12 @@ const Input = ({ style, ...props }) => (
             ...style
         }}
         onFocus={(e) => {
-            e.target.style.borderColor = 'rgba(109, 40, 217, 0.5)';
+            e.target.style.borderColor = error ? '#ff3333' : 'rgba(109, 40, 217, 0.5)';
             e.target.style.backgroundColor = 'rgba(109, 40, 217, 0.05)';
-            e.target.style.boxShadow = '0 0 0 3px rgba(109, 40, 217, 0.08)';
+            e.target.style.boxShadow = error ? '0 0 0 3px rgba(255, 51, 51, 0.08)' : '0 0 0 3px rgba(109, 40, 217, 0.08)';
         }}
         onBlur={(e) => {
-            e.target.style.borderColor = 'rgba(109, 40, 217, 0.15)';
+            e.target.style.borderColor = error ? '#ff3333' : 'rgba(109, 40, 217, 0.15)';
             e.target.style.backgroundColor = 'rgba(255,255,255,0.03)';
             e.target.style.boxShadow = 'none';
         }}

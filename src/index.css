@@ -176,6 +176,31 @@ ul { list-style: none; }
     }
 }
 
+/* Phone Input dark theme */
+.phone-input-dark .PhoneInputInput {
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    outline: none !important;
+    padding: 4px 0 !important;
+    font-family: inherit !important;
+}
+.phone-input-dark .PhoneInputInput::placeholder {
+    color: #666666 !important;
+}
+.phone-input-dark .PhoneInputCountry {
+    margin-right: 12px !important;
+}
+.phone-input-dark .PhoneInputCountrySelect {
+    background-color: #1c1822 !important;
+    color: #ffffff !important;
+}
+.phone-input-dark .PhoneInputCountrySelect option {
+    background-color: #1c1822 !important;
+    color: #ffffff !important;
+}
+
 /* Select & Option dark theme */
 select, select option {
     background-color: #1c1822 !important;
